@@ -1,0 +1,114 @@
+$def with (type, allGame, page, pageSize, gameList, gameId, gameInfo)
+<html>
+<head>
+</head>
+<body>
+
+$if type == 'gameInfo':
+    $ gameInfo = gameInfo['gameinfo']
+    $ nextType = not os.path.exists(romDir + gameInfo['gameid'] + '.zip') and 'gameSave' or 'gameDelt'
+    <form id="xiaoji" action="/xiaoji">
+        <input type="hidden" id="type" name="type" value="$nextType">
+        <input type="hidden" id="gameId" name="gameId" value="$gameInfo['gameid']">
+        <table border="1">
+            <tr>
+                <td>游戏编号</td>
+                <td>$gameInfo['gameid']
+                $if not os.path.exists(romDir + gameInfo['gameid'] + '.zip'):
+                    <input type="submit" value="安装">
+                $else:
+                    <input type="submit" value="删除">
+                </td>
+            </tr>
+            <tr>
+                <td>游戏名称</td>
+                <td>$gameInfo['gamename']</td>
+            </tr>
+            <tr>
+                <td>游戏简介</td>
+                <td>$gameInfo['description']</td>
+            </tr>
+            $if gameInfo['screens']:
+                <tr>
+                    <td>游戏截图</td>
+                    <td>
+                    $for index, screen in enumerate(gameInfo['screens']):
+                        $ (imgPath, imgFile) = os.path.split(screen)
+                        $ (imgName, imgType) = os.path.splitext(imgFile.split('!')[0])
+                        $ screenUrl = (imgUrl + screen)
+                        <input type="radio" name="image" value="$index" id="radio_$index"><img src="$screenUrl" width="300" height="225" id="image_$index" onclick="javascript:document.getElementById(this.id.replace('image', 'radio')).checked=true"/>
+                    </td>
+                </tr>
+            <tr>
+                <td>游戏评分</td>
+                <td>$gameInfo['rating']</td>
+            </tr>
+        </table>
+    </form>
+$elif type == 'gameList':
+    $ gameCount = gameList['count']
+    $ gameList = gameList['gamelist']
+    <table border="1">
+        <tr>
+            <th>序号</th>
+            <th>图标</th>
+            <th>游戏名称</th>
+            <th>评分</th>
+            <th>编号</th>
+        </tr>
+    $for game in gameList:
+        <tr>
+            <td>$loop.index</td>
+            $ iconUrl = imgUrl + game['icon']
+            <td><a href="/xiaoji?type=gameInfo&gameId=$game['gameid']" target="_black"><img src="$iconUrl" width="74" height="74"/></a></td>
+            <td><a href="/xiaoji?type=gameInfo&gameId=$game['gameid']" target="_black">$game['gamename']</a></td>
+            <td>$game['rating']</td>
+            <td>$game['gameid']</td>
+        </tr>
+    </table>
+    $ begin = (page - 1) * pageSize
+    $ end = page * pageSize > allGame and allGame or page * pageSize
+    $ pages = int(math.ceil(float(allGame) / pageSize))
+    $ disabledPre = page > 1 and ' ' or 'disabled'
+    $ disabledNxt = page < pages and ' ' or 'disabled'
+    <script type="text/javascript">
+    function navi(name) {
+        var t = 1;
+        var s = parseInt(document.getElementById("page").value);
+        switch(name)
+        {
+            case '<<':
+                t = 1;
+                break;
+            case '<':
+                t = s - 1;
+                break;
+            case '>':
+                t = s + 1;
+                break;
+            case '>>':
+                t = $pages;
+                break;
+            default:
+                break;
+        }
+        document.getElementById("page").value = t;
+        document.getElementById("xiaoji").submit();
+    }
+    </script>
+    <form id="xiaoji" action="/xiaoji">
+        <input type="hidden" id="type" name="type" value="gameList">
+        显示 $begin - $end, 共 $allGame 个
+        <input type="button" onclick="navi(this.value)" value="<<" $disabledPre>
+        <input type="button" onclick="navi(this.value)" value="<" $disabledPre>
+        第<input type="number" id="page" name="page" style="width:60;text-align:center" value="$page">页
+        <input type="hidden" id="pageSize" name="pageSize" style="width:60" value="$pageSize">
+        共 $pages 页
+        <input type="button" onclick="navi(this.value)" value=">" $disabledNxt>
+        <input type="button" onclick="navi(this.value)" value=">>" $disabledNxt>
+    </form>
+$else:
+    empty!
+
+</body>
+</html>
