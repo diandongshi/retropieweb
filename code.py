@@ -164,13 +164,17 @@ render = web.template.render('templates', globals = {'math': math, 'os': os, 'ap
 
 urls = (
     '/', 'index',
+    '/controller', 'controller',
     '/xiaoji', 'xiaoji'
 )
 
 class index:
-    def GET(self):
-        name = 'Bob'    
-        return render.index(name)
+    def GET(self): 
+        return render.index()
+
+class controller:
+    def GET(self):  
+        return render.controller()
 
 class xiaoji:
     def GET(self):
