@@ -115,16 +115,9 @@ def savGame2Pie(gameInfo, image):
         setPrp(doc, thisGame, 'developer', gameInfo['gameid'])
         setPrp(doc, thisGame, 'publisher', gameInfo['orgname'])
         setPrp(doc, thisGame, 'rating', ('%.1f'%((round((float)(gameInfo['rating'])/5, 1)))))
-        process = os.popen('ps -ef |grep "emulationstation" |grep -v "grep" |wc -l')
-        output = process.read()
-        process.close()
-        if int(output) > 0:
-            os.system('killall emulationstation')
         f = codecs.open(cfgXml, 'w', 'utf-8')
         doc.writexml(f)
         f.close()
-        if int(output) > 0:
-            os.system('/bin/sh /opt/retropie/supplementary/emulationstation/emulationstation.sh &')
         return 1
     except Exception as e:
         return 0
@@ -146,16 +139,9 @@ def delGame2Pie(gameId):
                     break
             if thisGame:
                 gameList.removeChild(thisGame)
-            process = os.popen('ps -ef |grep "emulationstation" |grep -v "grep" |wc -l')
-            output = process.read()
-            process.close()
-            if int(output) > 0:
-                os.system('killall emulationstation')
             f = codecs.open(cfgXml, 'w', 'utf-8')
             doc.writexml(f)
             f.close()
-            if int(output) > 0:
-                os.system('/bin/sh /opt/retropie/supplementary/emulationstation/emulationstation.sh &')
         return 1
     except Exception as e:
         return 0
